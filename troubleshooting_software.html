@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Troubleshooting Software</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:"Poppins",sans-serif;}
+    body{
+      background:linear-gradient(135deg,#e0f7ff,#f9fff0);
+      color:#333;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      overflow-x:hidden;
+    }
+
+    /* ==== ANIMASI GLOBAL ==== */
+    @keyframes fadeSlideDown {
+      from {opacity:0; transform:translateY(-30px);}
+      to {opacity:1; transform:translateY(0);}
+    }
+    @keyframes fadeSlideUp {
+      from {opacity:0; transform:translateY(30px);}
+      to {opacity:1; transform:translateY(0);}
+    }
+    @keyframes fadeIn {
+      from {opacity:0;}
+      to {opacity:1;}
+    }
+
+    /* ===== HEADER ===== */
+    .main-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background-color: #1f75ffff;
+      color: white;
+      border-bottom: 4px solid #34db3cff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      z-index: 1000;
+      animation: slideDown 0.8s ease;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .header-left,
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-logo-left,
+    .header-logo {
+      width: 55px;
+      height: 55px;
+      background-color: white;
+      border-radius: 50%;
+      padding: 6px;
+      object-fit: contain;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .header-logo:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .main-header h1 {
+      font-size: 1.3em;
+      font-weight: 600;
+      margin: 0;
+      text-align: center;
+      flex: 1;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1f75ffff;
+      color: white;
+      text-align: center;
+      padding: 12px 20px;
+      font-size: 0.95em;
+      border-top: 4px solid #00e636ff;
+      z-index: 999;
+      animation: slideUp 1s ease;
+    }
+
+
+    /* ==== MAIN ==== */
+    main{
+      max-width:1000px;
+      margin:auto;
+      padding:25px;
+      width:90%;
+      animation:fadeIn 1.2s ease forwards;
+      padding-top: calc(80px + 20px); /* tinggi header + jarak tambahan */
+
+    }
+
+    /* ==== CARD ==== */
+    .card{
+      background:#fff;
+      padding:20px 25px;
+      border-radius:16px;
+      margin-bottom:25px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.1);
+      opacity:0;
+      transform:translateY(30px);
+      animation:fadeSlideUp 0.8s ease forwards;
+    }
+
+    /* Animasi berurutan tiap card */
+    .card:nth-child(2){animation-delay:0.3s;}
+    .card:nth-child(3){animation-delay:0.5s;}
+    .card:nth-child(4){animation-delay:0.7s;}
+    .card:nth-child(5){animation-delay:0.9s;}
+
+    .card h2{color:#0077b6;margin-bottom:10px;}
+    .solution{
+      background:#f0faff;
+      border-left:4px solid #0077b6;
+      padding:10px 15px;
+      border-radius:8px;
+    }
+
+    /* ==== FOOTER ==== */
+    footer{
+      text-align:center;
+      background:#0077b6;
+      color:#fff;
+      padding:10px;
+      margin-top:auto;
+      animation:fadeSlideUp 1s ease forwards;
+    }
+
+    /* ==== BUTTON BACK ==== */
+    a.back{
+      display:inline-block;
+      background:#0077b6;
+      color:#fff;
+      padding:8px 16px;
+      border-radius:8px;
+      text-decoration:none;
+      margin-bottom:20px;
+      transition:background 0.3s;
+    }
+    a.back:hover{background:#005f8a;}
+  </style>
+</head>
+<body>
+
+
+  <header class="main-header">
+    <h1><i class="fa-solid fa-chart-line"></i> Troubleshooting Software</h1>
+    <div class="header-right">
+      <img src="assets/logo.png" alt="Logo Sistem" class="header-logo">
+    </div>
+  </header>
+  <main>
+    <a href="troubleshooting.html" class="back">⬅ Kembali ke Menu Utama</a>
+
+    <div class="card">
+      <h2>1. Website Tidak Menampilkan Data</h2>
+      <p><b>Penyebab:</b> URL Google Script salah atau belum di-deploy sebagai Web App.</p>
+      <div class="solution">
+        <b>Solusi:</b><br>
+        - Buka Google Apps Script dan pilih <b>Deploy → New Deployment</b>.<br>
+        - Pastikan akses "Anyone" atau "Anyone with link".<br>
+        - Ganti URL lama di file PHP atau JavaScript dengan yang baru.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>2. ESP8266 Tidak Bisa Kirim Data</h2>
+      <p><b>Penyebab:</b> API Google Script tidak merespons, atau format HTTPClient salah.</p>
+      <div class="solution">
+        <b>Solusi:</b><br>
+        - Gunakan format baru: <code>http.begin(WiFiClient, scriptURL);</code><br>
+        - Pastikan WiFi terhubung (uji dengan <code>WiFi.status()</code>).<br>
+        - Tes URL Google Script dari browser, pastikan bisa dibuka.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>3. Data Tidak Masuk ke Google Sheets</h2>
+      <p><b>Penyebab:</b> Spreadsheet ID salah atau variabel POST tidak cocok.</p>
+      <div class="solution">
+        <b>Solusi:</b><br>
+        - Periksa apakah Apps Script memakai <code>doPost(e)</code> dengan parameter sesuai JSON.<br>
+        - Pastikan kolom di spreadsheet sesuai urutan data kiriman.<br>
+        - Tambahkan <code>Logger.log(e.postData.contents)</code> untuk debug.
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>4. Website Error atau Blank</h2>
+      <p><b>Penyebab:</b> Kesalahan sintaks PHP/JS atau file tidak ditemukan.</p>
+      <div class="solution">
+        <b>Solusi:</b><br>
+        - Buka Console (Ctrl+Shift+I) untuk melihat pesan error.<br>
+        - Pastikan semua file (sidebar.php, script.js, dll) ada di folder yang benar.<br>
+        - Jika menggunakan server lokal, jalankan dengan <code>localhost</code> atau XAMPP.
+      </div>
+    </div>
+  </main>
+
+  <footer>© 2025 Sistem Monitoring Titik Api</footer>
+
+</body>
+</html>

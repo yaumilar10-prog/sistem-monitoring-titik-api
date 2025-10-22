@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grafik Data Sensor</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* ===== RESET ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #e0f7ff, #f9fff0);
+      color: #333;
+      min-height: 100vh;
+      transition: margin-left 0.3s ease;
+      margin-left: 230px; /* ruang sidebar */
+    }
+
+        /* ===== WATERMARK BMKG ===== */
+    .watermark {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 500px;
+      height: 500px;
+      background: url('assets/bmkg-logo.jpg') no-repeat center center;
+      background-size: contain;
+      opacity: 0.08;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+/* === SIDEBAR === */
+.sidebar {
+  position: fixed;
+  top: 70px; /* sejajar dengan header */
+  left: 0;
+  bottom: 0;
+  width: 230px;
+  background: linear-gradient(180deg, #1e293b, #0f172a);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.35);
+  z-index: 900;
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  border-top-right-radius: 10px;
+}
+
+/* Scrollbar Sidebar */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background-color: #005fe5ff;
+  border-radius: 10px;
+}
+
+/* Header Sidebar */
+.sidebar-header {
+  text-align: center;
+  margin: 10px 0 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #00e676;
+  font-size: 18px;
+}
+
+/* Menu Sidebar */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  flex: 1;
+}
+
+.sidebar-menu li {
+  width: 100%;
+}
+
+.sidebar-menu li a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #e5e7eb;
+  text-decoration: none;
+  padding: 12px 20px;
+  border-left: 4px solid transparent;
+  transition: all 0.3s ease;
+  font-size: 15px;
+}
+
+.sidebar-menu li a:hover {
+  background: #00e676;
+  color: #000;
+  border-left: 4px solid #000;
+  font-weight: 600;
+  transform: translateX(3px);
+}
+
+.sidebar-menu li a i {
+  width: 20px;
+  text-align: center;
+  font-size: 16px;
+}
+
+/* === TOMBOL TOGGLE === */
+#toggle-btn {
+  position: fixed;
+  top: 13px;
+  left: 250px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 1001;
+  transition: all 0.3s ease;
+}
+
+#toggle-btn .toggle-logo {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: white;
+  padding: 5px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#toggle-btn .toggle-logo:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* === Sidebar Hide === */
+.sidebar.hidden {
+  transform: translateX(-100%);
+}
+
+body {
+  margin-left: 230px;
+  transition: margin-left 0.3s ease;
+}
+
+body.sidebar-hidden {
+  margin-left: 0;
+}
+
+#toggle-btn.sidebar-hidden {
+  left: 15px;
+}
+
+/* === RESPONSIF === */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px;
+    top: 60px;
+  }
+  body {
+    margin-left: 0;
+  }
+  #toggle-btn {
+    left: 15px;
+  }
+}
+
+    /* ===== HEADER ===== */
+.main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background-color: #1f75ffff;
+    color: white;
+    border-bottom: 4px solid #34db3cff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    z-index: 1000;
+}
+
+/* Bagian kiri dan kanan header */
+.header-left,
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Logo kiri agar tidak tertutup sidebar (geser sedikit ke kanan) */
+.header-logo-left {
+    width: 55px;
+    height: 55px;
+    background-color: white;
+    border-radius: 50%;
+    padding: 6px;
+    object-fit: contain;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    margin-left: 10px; /* memberi jarak aman dari tombol sidebar */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.header-logo-left:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* Logo kanan */
+.header-logo {
+    width: 60px;
+    height: 60px;
+    background-color: white;
+    border-radius: 50%;
+    padding: 8px;
+    object-fit: contain;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .header-logo:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+
+  /* Judul di tengah */
+  .main-header h1 {
+      font-size: 1.3em;
+      font-weight: 600;
+      margin: 0;
+      text-align: center;
+      flex: 1;
+  }
+
+    .header-logo {
+    position: absolute;
+    top: 10px;          /* jarak dari atas */
+    right: 15px;        /* jarak dari kanan */
+    width: 55px;
+    height: 55px;
+    background-color: white;
+    border-radius: 50%;
+    padding: 8px;
+    object-fit: contain;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+}
+
+
+    /* ===== CONTAINER ===== */
+    .container {
+      width: 95%;
+      max-width: 1400px;
+      margin: 110px auto 80px; /* biar ga ketutup header/footer */
+      background-color: #ffffff;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      text-align: center;
+      color: #ffffffff;
+      margin-bottom: 25px;
+      font-size: 1.8em;
+      font-weight: 700;
+    }
+
+    /* ===== CONTROL FILTER ===== */
+    .controls {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .controls label {
+      font-weight: 500;
+      color: #004d40;
+    }
+
+    .controls input[type="date"],
+    .controls button {
+      padding: 10px 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .controls input[type="date"]:focus {
+      border-color: #00bcd4;
+      box-shadow: 0 0 5px rgba(0, 188, 212, 0.3);
+    }
+
+    .controls button {
+      background-color: #00bcd4;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .controls button:hover {
+      background-color: #00e676;
+      color: #000;
+    }
+
+    .controls button:disabled {
+      background-color: #b0bec5;
+      cursor: not-allowed;
+    }
+
+    /* ===== CHART SECTION ===== */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .chart-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      background: #fff;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .chart-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    .chart-card h2 {
+      text-align: center;
+      margin: 8px 0 12px;
+      color: #34495e;
+      font-size: 1.1em;
+    }
+
+    .chart-wrapper {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+
+    #statusMessage {
+      text-align: center;
+      font-size: 16px;
+      color: #7f8c8d;
+      margin-top: 25px;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1f75ffff;
+      color: white;
+      text-align: center;
+      padding: 12px 20px;
+      border-top: 4px solid #34db3cff;
+      font-size: 0.95em;
+      z-index: 999;
+    }
+/* ===== ANIMASI MASUK HALUS ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Terapkan animasi ke elemen utama */
+.main-header,
+.container,
+footer {
+  /* Atur agar elemen awalnya tidak terlihat sebelum animasi */
+  opacity: 0;
+  /* Nama animasi, durasi, timing function, dan fill mode */
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* Beri jeda (delay) agar elemen muncul berurutan */
+.container {
+  animation-delay: 0.2s;
+}
+
+footer {
+  animation-delay: 0.4s;
+}
+
+/* Animasi untuk setiap kartu grafik agar muncul satu per satu */
+.chart-card {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Atur jeda untuk setiap kartu grafik secara berurutan */
+.chart-card:nth-child(1) { animation-delay: 0.4s; }
+.chart-card:nth-child(2) { animation-delay: 0.5s; }
+.chart-card:nth-child(3) { animation-delay: 0.6s; }
+.chart-card:nth-child(4) { animation-delay: 0.7s; }
+.chart-card:nth-child(5) { animation-delay: 0.8s; }
+.chart-card:nth-child(6) { animation-delay: 0.9s; }
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      body {
+        margin-left: 0;
+      }
+      .container {
+        margin-top: 90px;
+        margin-bottom: 80px;
+        width: 95%;
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+    <div class="watermark"></div>
+
+  <!-- HEADER -->
+  <header class="main-header">
+    <h1><i class="fa-solid fa-chart-line"></i> Grafik Data Sensor</h1>
+    <div class="header-right">
+      <img src="assets/logo.png" alt="Logo Sistem" class="header-logo">
+    </div>
+  </header>
+
+
+  <!-- === SIDEBAR === -->
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fa-solid fa-clipboard-list"></i> Menu</h2>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="index.html"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+      <li><a href="grafik.html"><i class="fa-solid fa-chart-line"></i> Grafik</a></li>
+      <li><a href="history.html"><i class="fa-solid fa-clock-rotate-left"></i> History</a></li>
+      <li><a href="troubleshooting.html"><i class="fa-solid fa-screwdriver-wrench"></i> TroubleShooting</a></li>
+    </ul>
+  </div>
+
+    <!-- Tombol Toggle (Ganti dari ☰ ke ikon logo) -->
+  <button id="toggle-btn" title="Sembunyikan Sidebar">
+    <img src="assets/bmkg-logo.jpg" alt="Logo" class="toggle-logo">
+  </button>
+
+
+  <!-- KONTEN -->
+  <div class="container">
+    <h1>Grafik History Data Sensor</h1>
+
+    <div class="controls">
+      <label for="startDate">Dari Tanggal:</label>
+      <input type="date" id="startDate">
+      <label for="endDate">Hingga Tanggal:</label>
+      <input type="date" id="endDate">
+      <button id="fetchDataBtn">Tampilkan Grafik</button>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card"><h2>Grafik Suhu (°C)</h2><div class="chart-wrapper"><canvas id="suhuChart"></canvas></div></div>
+      <div class="chart-card"><h2>Grafik Gas (PPM)</h2><div class="chart-wrapper"><canvas id="gasChart"></canvas></div></div>
+      <div class="chart-card"><h2>Grafik Kelembaban (%)</h2><div class="chart-wrapper"><canvas id="kelembabanChart"></canvas></div></div>
+      <div class="chart-card"><h2>Grafik Kecepatan Angin (m/s)</h2><div class="chart-wrapper"><canvas id="anginChart"></canvas></div></div>
+      <div class="chart-card"><h2>Grafik Arah Angin (°)</h2><div class="chart-wrapper"><canvas id="derajatChart"></canvas></div></div>
+      <div class="chart-card"><h2>Grafik Status</h2><div class="chart-wrapper"><canvas id="statusChart"></canvas></div></div>
+    </div>
+
+    <p id="statusMessage">Pilih rentang tanggal dan klik tombol untuk menampilkan data.</p>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>© 2025 Sistem Monitoring Titik Api | BMKG Balikpapan x Poltekba</footer>
+
+  <!-- SCRIPT GRAFIK -->
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwT1PWvlRfPkJBCTsXzb9s1FaJ96JFYIYaVlluQm_q4g_K4UFzdOsRYqvr07rY53RjcGQ/exec";
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const fetchButton = document.getElementById('fetchDataBtn');
+    const statusMessage = document.getElementById('statusMessage');
+
+    const suhuCanvas = document.getElementById('suhuChart');
+    const gasCanvas = document.getElementById('gasChart');
+    const kelembabanCanvas = document.getElementById('kelembabanChart');
+    const anginCanvas = document.getElementById('anginChart');
+    const derajatCanvas = document.getElementById('derajatChart');
+    const statusCanvas = document.getElementById('statusChart');
+
+    let suhuChartInstance, gasChartInstance, kelembabanChartInstance, anginChartInstance, derajatChartInstance, statusChartInstance;
+
+    const today = new Date().toISOString().split('T')[0];
+    startDateInput.value = today;
+    endDateInput.value = today;
+    fetchButton.addEventListener('click', fetchAndDrawChart);
+
+    async function fetchAndDrawChart() {
+      const startDate = startDateInput.value;
+      const endDate = endDateInput.value;
+
+      if (!startDate || !endDate) {
+        statusMessage.textContent = "Silakan pilih tanggal awal dan akhir.";
+        return;
+      }
+
+      const requestUrl = `${SCRIPT_URL}?action=getHistory&startDate=${startDate}&endDate=${endDate}`;
+      statusMessage.textContent = "Sedang mengambil data, mohon tunggu...";
+      fetchButton.disabled = true;
+
+      [suhuChartInstance, gasChartInstance, kelembabanChartInstance, anginChartInstance, derajatChartInstance, statusChartInstance].forEach(c => c && c.destroy());
+
+      try {
+        const response = await fetch(requestUrl);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const jsonResponse = await response.json();
+
+        if (jsonResponse.status === "success" && jsonResponse.data.length > 0) {
+          processDataAndRenderChart(jsonResponse.data);
+          statusMessage.textContent = `Menampilkan ${jsonResponse.count} data dari ${startDate} hingga ${endDate}.`;
+        } else {
+          statusMessage.textContent = "Tidak ada data ditemukan untuk rentang tanggal yang dipilih.";
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        statusMessage.textContent = "Terjadi kesalahan saat mengambil data. Coba lagi.";
+      } finally {
+        fetchButton.disabled = false;
+      }
+    }
+
+    function processDataAndRenderChart(data) {
+      const labels = data.map(row => row.timestamp);
+      const suhuData = data.map(row => parseFloat(row.suhu) || 0);
+      const gasData = data.map(row => parseFloat(row.gas) || 0);
+      const kelembabanData = data.map(row => parseFloat(row.hum) || 0);
+      const anginData = data.map(row => parseFloat(row.wind) || 0);
+      const derajatData = data.map(row => parseFloat(row.derajat) || 0);
+      const statusData = data.map(row => {
+        const status = row.status.toLowerCase();
+        if (status === 'aman') return 1;
+        if (status === 'waspada') return 2;
+        if (status === 'bahaya') return 3;
+        return 0;
+      });
+
+      const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true } },
+        plugins: { legend: { display: false } },
+        interaction: { mode: 'index', intersect: false },
+        tension: 0.3,
+      };
+
+      const charts = [
+        { ctx: suhuCanvas, label: 'Suhu', data: suhuData, color: 'rgba(255,99,132,1)' },
+        { ctx: gasCanvas, label: 'Gas', data: gasData, color: 'rgba(54,162,235,1)' },
+        { ctx: kelembabanCanvas, label: 'Kelembaban', data: kelembabanData, color: 'rgba(75,192,192,1)' },
+        { ctx: anginCanvas, label: 'Kecepatan Angin', data: anginData, color: 'rgba(153,102,255,1)' },
+        { ctx: derajatCanvas, label: 'Arah Angin', data: derajatData, color: 'rgba(255,159,64,1)' },
+      ];
+
+      charts.forEach(cfg => {
+        new Chart(cfg.ctx.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: cfg.label,
+              data: cfg.data,
+              borderColor: cfg.color,
+              backgroundColor: cfg.color.replace('1)', '0.2)'),
+              borderWidth: 2,
+              fill: true,
+            }]
+          },
+          options: commonOptions
+        });
+      });
+
+      statusChartInstance = new Chart(statusCanvas.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Status',
+            data: statusData,
+            borderColor: 'rgba(255,206,86,1)',
+            backgroundColor: 'rgba(255,206,86,0.2)',
+            borderWidth: 2,
+            fill: true,
+            stepped: true,
+          }]
+        },
+        options: {
+          ...commonOptions,
+          scales: {
+            y: {
+              min: 0,
+              max: 4,
+              ticks: {
+                callback: (v) => ['','Aman','Waspada','Bahaya'][v] || ''
+              }
+            }
+          }
+        }
+      });
+    }
+    //SIDE BAR
+const sidebar = document.getElementById("sidebar");
+const toggleBtn = document.getElementById("toggle-btn");
+
+toggleBtn.addEventListener("click", () => {
+  sidebar.classList.toggle("hidden");
+  document.body.classList.toggle("sidebar-hidden");
+  toggleBtn.classList.toggle("sidebar-hidden");
+  toggleBtn.title = sidebar.classList.contains("hidden")
+    ? "Tampilkan Sidebar"
+    : "Sembunyikan Sidebar";
+});
+
+  </script>
+</body>
+</html>

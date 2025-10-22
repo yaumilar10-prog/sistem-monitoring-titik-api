@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <title>Troubleshooting Hardware - Sistem Monitoring Titik Api</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #e0f7ff, #f9fff0);
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+      animation: fadeInBody 0.8s ease-in-out;
+    }
+
+    @keyframes fadeInBody {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* ===== WATERMARK BMKG ===== */
+    .watermark {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 500px;
+      height: 500px;
+      background: url('assets/bmkg-logo.jpg') no-repeat center center;
+      background-size: contain;
+      opacity: 0.08;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ===== HEADER ===== */
+    .main-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background-color: #1f75ffff;
+      color: white;
+      border-bottom: 4px solid #34db3cff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      z-index: 1000;
+      animation: slideDown 0.8s ease;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .header-left,
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-logo-left,
+    .header-logo {
+      width: 55px;
+      height: 55px;
+      background-color: white;
+      border-radius: 50%;
+      padding: 6px;
+      object-fit: contain;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .header-logo:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .main-header h1 {
+      font-size: 1.3em;
+      font-weight: 600;
+      margin: 0;
+      text-align: center;
+      flex: 1;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1f75ffff;
+      color: white;
+      text-align: center;
+      padding: 12px 20px;
+      font-size: 0.95em;
+      border-top: 4px solid #00e636ff;
+      z-index: 999;
+      animation: slideUp 1s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    main {
+      padding: 30px 25px;
+      max-width: 1100px;
+      margin: 100px auto 80px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 1.6rem;
+      color: #0077b6;
+      margin-bottom: 25px;
+      font-weight: 600;
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 22px;
+      padding: 20px 25px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: fadeInCard 1s ease forwards;
+    }
+
+    @keyframes fadeInCard {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+
+    .card h3 {
+      color: #e53935;
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+    }
+
+    .card h4 {
+      color: #0077b6;
+      margin-top: 10px;
+      font-size: 1.1rem;
+    }
+
+    .card ul {
+      margin-left: 22px;
+      line-height: 1.7;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 25px;
+      background: #0077b6;
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: background 0.3s;
+      animation: fadeInUp 0.8s ease;
+    }
+
+    .back-btn:hover {
+      background: #005f8a;
+    }
+
+    /* ===== GAMBAR ANIMASI POP-UP ===== */
+    .hardware-image {
+      display: block;
+      margin: 20px auto;
+      width: 300px;
+      border-radius: 10px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+      opacity: 0;
+      transform: scale(0.8);
+      animation: popUp 0.8s ease forwards;
+    }
+
+    @keyframes popUp {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      80% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .card {
+        padding: 18px;
+      }
+
+      .watermark {
+        width: 220px;
+        height: 220px;
+        opacity: 0.1;
+      }
+
+      .hardware-image {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <?php include 'sidebar.php'; ?>
+
+  <div class="watermark"></div>
+
+  <header class="main-header">
+    <h1><i class="fa-solid fa-chart-line"></i> Troubleshooting Hardware</h1>
+    <div class="header-right">
+      <img src="assets/logo.png" alt="Logo Sistem" class="header-logo">
+    </div>
+  </header>
+
+  <main>
+    <a href="troubleshooting.html" class="back-btn">← Kembali ke Menu Utama</a>
+
+    <div class="card">
+      <h2 class="section-title">Panduan Mengatasi Masalah pada Sensor & Perangkat</h2>
+    </div>
+
+    <!-- === LCD === -->
+    <div class="card">
+      <h3>1. LCD (Liquid Crystal Display)</h3>
+      <h4>Lcd berfungsi menampilkan informasi terkait suhu, kelembapan, asap/gas, arah dan kecepatan angin. Jika LCD tidak menampilkan informasi atau muncul gambar error seperti di bawah ini:</h4>
+      <img src="assets/lcd-eror.jpg" alt="Lcd Error" class="hardware-image">
+      <h4>Cara Mengatasi:</h4>
+      <p>Cabut kabel USB Arduino yang terhubung dengan SCC (solar charge controller) seperti pada gambar di bawah:</p>
+      <img src="assets/scc.png" alt="SCC" class="hardware-image">
+    </div>
+
+    <!-- === UPLOAD ARDUINO === -->
+    <div class="card">
+      <h3>2. Upload kode atau data untuk Arduino</h3>
+      <h4>Jika ingin upload kode baru, pastikan terlebih dahulu melepas kabel RX dan TX yang terhubung dengan sensor arah angin agar tidak terjadi kegagalan upload code.</h4>
+      <img src="assets/arah-angin.png" alt="TX-RX Arah Angin" class="hardware-image">
+      <h4>Cara Mengatasi:</h4>
+      <p>Warna kabel yang perlu dicabut yaitu orange dan hijau (RX dan TX). Biru dan coklat adalah tegangan + dan –, tidak perlu dicabut.</p>
+      <img src="assets/tx-rx-arah-angin.png" alt="TX-RX Arah Angin" class="hardware-image">
+    </div>
+
+    <!-- === SENSOR ARAH ANGIN === -->
+    <div class="card">
+      <h3>3. Sensor arah angin tidak tampil atau UNKNOWN</h3>
+      <h4>Kemungkinan penyebab:</h4>
+      <ul>
+        <li>Kabel RX dan TX tidak terhubung (data tidak terkirim).</li>
+        <li>Kabel power + dan – terlepas.</li>
+      </ul>
+      <h4>Cara Mengatasi:</h4>
+      <p>Buka pelindung kabel arah mata angin dan pastikan semua koneksi terhubung dengan benar.</p>
+    </div>
+
+    <!-- === UPLOAD ESP === -->
+    <div class="card">
+      <h3>4. Upload kode atau data untuk ESP8266</h3>
+      <h4>Penyebab Umum:</h4>
+      <p>Tidak bisa mengupload program dari Arduino IDE ke ESP8266 maupun Arduino.</p>
+      <h4>Cara Mengatasi:</h4>
+      <p>Lepas kabel berwarna ungu yang menghubungkan pin RX ESP dan TX Arduino sebelum upload.</p>
+    </div>
+
+    <!-- === TEGANGAN === -->
+    <div class="card">
+      <h3>5. Tidak ada tegangan yang masuk ke Arduino</h3>
+      <h4>Periksa hal berikut:</h4>
+      <ul>
+        <li>Lihat apakah SCC mengisi baterai (indikator baterai status menyala).</li>
+        <li>Periksa indikator "charging status" pada solar panel.</li>
+        <li>Ukur output DC-DC Step-Down Converter Module.</li>
+        <li>Pastikan kabel arah angin tidak tertukar (+ dan –).</li>
+      </ul>
+      <ul>
+        <li>Pastikan kabel VCC, GND, dan output tersambung dengan benar.</li>
+        <li>Gunakan interrupt di mikrokontroler untuk membaca pulsa (attachInterrupt).</li>
+        <li>Periksa kontinuitas reed switch dengan multimeter.</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer>© 2025 Sistem Monitoring Titik Api</footer>
+</body>
+</html>

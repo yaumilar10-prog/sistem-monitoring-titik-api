@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>History & Grafik</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <style>
+    * {
+      margin: 0; padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #e0f7ff, #f9fff0);
+      color: #333;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: margin-left 0.3s ease;
+    }
+
+    /* ===== HEADER ===== */
+    .main-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 80px;
+      background-color: #1f75ff;
+      color: white;
+      border-bottom: 4px solid #34db3c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeInDown 0.8s ease forwards;
+    }
+    @keyframes fadeInDown {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .main-header h1 {
+      font-size: 1.3em;
+      font-weight: 600;
+    }
+    .header-logo {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      width: 55px; height: 55px;
+      background-color: white;
+      border-radius: 50%;
+      padding: 8px;
+      object-fit: contain;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .header-logo:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    /* ===== WATERMARK ===== */
+    .watermark {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 500px;
+      height: 500px;
+      background: url('assets/bmkg-logo.jpg') no-repeat center center;
+      background-size: contain;
+      opacity: 0.08;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    /* === SIDEBAR === */
+    .sidebar {
+      position: fixed;
+      top: 70px; /* sejajar dengan header */
+      left: 0;
+      bottom: 0;
+      width: 230px;
+      background: linear-gradient(180deg, #1e293b, #0f172a);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding-top: 10px;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.35);
+      z-index: 900;
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+      border-top-right-radius: 10px;
+    }
+
+    /* Scrollbar Sidebar */
+    .sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+      background-color: #005fe5ff;
+      border-radius: 10px;
+    }
+
+    /* Header Sidebar */
+    .sidebar-header {
+      text-align: center;
+      margin: 10px 0 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #00e676;
+      font-size: 18px;
+    }
+
+    /* Menu Sidebar */
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      flex: 1;
+    }
+
+    .sidebar-menu li {
+      width: 100%;
+    }
+
+    .sidebar-menu li a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #e5e7eb;
+      text-decoration: none;
+      padding: 12px 20px;
+      border-left: 4px solid transparent;
+      transition: all 0.3s ease;
+      font-size: 15px;
+    }
+
+    .sidebar-menu li a:hover {
+      background: #00e676;
+      color: #000;
+      border-left: 4px solid #000;
+      font-weight: 600;
+      transform: translateX(3px);
+    }
+
+    .sidebar-menu li a i {
+      width: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    /* === TOMBOL TOGGLE === */
+    #toggle-btn {
+      position: fixed;
+      top: 13px;
+      left: 250px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      z-index: 1001;
+      transition: all 0.3s ease;
+    }
+
+    #toggle-btn .toggle-logo {
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: white;
+      padding: 5px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #toggle-btn .toggle-logo:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* === Sidebar Hide === */
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    body {
+      margin-left: 230px;
+      transition: margin-left 0.3s ease;
+    }
+
+    body.sidebar-hidden {
+      margin-left: 0;
+    }
+
+    #toggle-btn.sidebar-hidden {
+      left: 15px;
+    }
+
+    /* === RESPONSIF === */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 200px;
+        top: 60px;
+      }
+      body {
+        margin-left: 0;
+      }
+      #toggle-btn {
+        left: 15px;
+      }
+    }
+    /* ===== MAIN CONTENT ===== */
+    main {
+      flex: 1;
+      margin: 120px auto 80px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      max-width: 90%;
+      text-align: center;
+      animation: fadeInUp 1s ease forwards;
+    }
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    main h2 {
+      margin-bottom: 20px;
+      color: #0f172a;
+    }
+
+    /* ===== FILTER ===== */
+    .filter-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .filter-section label {
+      font-weight: 500;
+      color: #2c3e50;
+    }
+    .filter-section input[type="date"],
+    .filter-section button {
+      padding: 10px 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+    .filter-section button {
+      background-color: #00bcd4;
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .filter-section button:hover {
+      background-color: #00e676;
+      color: #000;
+    }
+
+    /* ===== TABEL ===== */
+    .tabel-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    table {
+      width: 90%;
+      max-width: 900px;
+      border-collapse: collapse;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    thead {
+      background-color: #0f172a;
+      color: white;
+    }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+      font-size: 14px;
+    }
+    tr:hover {
+      background: #f1f5f9;
+    }
+
+    /* ===== PESAN ===== */
+    .message {
+      text-align: center;
+      margin: 15px 0;
+      font-size: 16px;
+      color: #555;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    .message.error {
+      color: #d32f2f;
+      font-weight: 600;
+    }
+    .message.success {
+      color: #2e7d32;
+      font-weight: 600;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #1f75ff;
+      color: white;
+      text-align: center;
+      padding: 12px 20px;
+      font-size: 0.95em;
+      border-top: 4px solid #00e676;
+      z-index: 999;
+      animation: fadeInUp 1s ease forwards;
+      animation-delay: 0.6s;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      main {
+        margin: 100px 10px 90px 10px;
+        padding: 20px;
+      }
+      table {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="watermark"></div>
+
+  <header class="main-header">
+    <h1><i class="fa-solid fa-history"></i> History Data</h1>
+    <img src="assets/logo.png" alt="Logo Sistem" class="header-logo">
+  </header>
+
+<!-- === SIDEBAR === -->
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-header">
+    <h2><i class="fa-solid fa-clipboard-list"></i> Menu</h2>
+  </div>
+  <ul class="sidebar-menu">
+    <li><a href="index.html"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+    <li><a href="grafik.html"><i class="fa-solid fa-chart-line"></i> Grafik</a></li>
+    <li><a href="history.html"><i class="fa-solid fa-clock-rotate-left"></i> History</a></li>
+    <li><a href="troubleshooting.html"><i class="fa-solid fa-screwdriver-wrench"></i> TroubleShooting</a></li>
+  </ul>
+</div>
+<!-- Tombol Toggle -->
+<button id="toggle-btn" title="Sembunyikan Sidebar">
+  <img src="assets/bmkg-logo.jpg" alt="Logo" class="toggle-logo">
+</button>
+
+  <main>
+    <h2>Riwayat Data Sensor</h2>
+
+    <div class="filter-section">
+      <label>Dari: <input type="date" id="startDate"></label>
+      <label>Sampai: <input type="date" id="endDate"></label>
+      <button id="loadBtn">Tampilkan</button>
+    </div>
+
+    <div class="message" id="message">Silakan pilih rentang tanggal.</div>
+
+    <div class="tabel-container" id="tabelContainer" style="display:none;">
+      <table id="dataTable">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>© 2025 Sistem Monitoring Titik Api | BMKG Balikpapan x Poltekba</footer>
+
+  <script>
+    const googleScriptUrl = "https://script.google.com/macros/s/AKfycbwT1PWvlRfPkJBCTsXzb9s1FaJ96JFYIYaVlluQm_q4g_K4UFzdOsRYqvr07rY53RjcGQ/exec";
+
+    const loadBtn = document.getElementById('loadBtn');
+    const message = document.getElementById('message');
+    const tabelContainer = document.getElementById('tabelContainer');
+    const tableHead = document.getElementById('tableHead');
+    const tableBody = document.getElementById('tableBody');
+
+    loadBtn.addEventListener('click', () => {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+
+      if (!startDate || !endDate) {
+        showMessage('⚠️ Masukkan tanggal awal dan akhir.', true);
+        tabelContainer.style.display = 'none';
+        return;
+      }
+
+      showMessage('⏳ Mengambil data dari server...');
+      tabelContainer.style.display = 'none';
+
+      const url = `${googleScriptUrl}?action=getHistory&startDate=${startDate}&endDate=${endDate}`;
+
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success' && data.count > 0) {
+            renderTable(data.data);
+            showMessage(`✅ Ditemukan ${data.count} data dari ${startDate} hingga ${endDate}.`, false);
+          } else {
+            tableBody.innerHTML = '';
+            tableHead.innerHTML = '';
+            tabelContainer.style.display = 'none';
+            showMessage('❌ Tidak ada data untuk rentang tanggal tersebut.', true);
+          }
+        })
+        .catch(err => {
+          showMessage('⚠️ Gagal mengambil data dari server. Silakan periksa koneksi internet atau status backend.', true);
+          console.error('Fetch error:', err);
+        });
+    });
+
+    function renderTable(rows) {
+      if (!rows || rows.length === 0) return;
+      const headers = Object.keys(rows[0]);
+      tableHead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+      tableBody.innerHTML = rows.map(r => `
+        <tr>${headers.map(h => `<td>${r[h] ?? '-'}</td>`).join('')}</tr>
+      `).join('');
+      tabelContainer.style.display = 'flex';
+    }
+
+    function showMessage(msg, isError = false) {
+      message.textContent = msg;
+      message.className = isError ? 'message error' : 'message success';
+    }
+    //sidebar
+const sidebar = document.getElementById("sidebar");
+const toggleBtn = document.getElementById("toggle-btn");
+
+toggleBtn.addEventListener("click", () => {
+  sidebar.classList.toggle("hidden");
+  document.body.classList.toggle("sidebar-hidden");
+  toggleBtn.classList.toggle("sidebar-hidden");
+  toggleBtn.title = sidebar.classList.contains("hidden")
+    ? "Tampilkan Sidebar"
+    : "Sembunyikan Sidebar";
+});
+  </script>
+</body>
+</html>
